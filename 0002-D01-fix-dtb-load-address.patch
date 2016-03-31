@@ -1,0 +1,41 @@
+From e4794c591622bd35231be922a78f601d3761085a Mon Sep 17 00:00:00 2001
+From: chenzhihui <chenzhihui4@huawei.com>
+Date: Wed, 30 Mar 2016 17:03:26 +0800
+Subject: [PATCH 2/2] D01: fix dtb load address
+
+Hisilicon: changed linux.h to load kernel and dtb into specific address
+for D01 board
+---
+ grub-core/loader/arm/linux.c | 2 +-
+ include/grub/arm/linux.h     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/loader/arm/linux.c b/grub-core/loader/arm/linux.c
+index 5b39f02..aa94d05 100644
+--- a/grub-core/loader/arm/linux.c
++++ b/grub-core/loader/arm/linux.c
+@@ -51,7 +51,7 @@ typedef void (*kernel_entry_t) (int, unsigned long, void *);
+ 
+ #define LINUX_PHYS_OFFSET        (0x00008000)
+ #define LINUX_INITRD_PHYS_OFFSET (LINUX_PHYS_OFFSET + 0x02000000)
+-#define LINUX_FDT_PHYS_OFFSET    (LINUX_INITRD_PHYS_OFFSET - 0x10000)
++# define LINUX_FDT_PHYS_OFFSET    0x10cf0000
+ 
+ static grub_size_t
+ get_atag_size (grub_uint32_t *atag)
+diff --git a/include/grub/arm/linux.h b/include/grub/arm/linux.h
+index 059dbba..43ebe91 100644
+--- a/include/grub/arm/linux.h
++++ b/include/grub/arm/linux.h
+@@ -39,7 +39,7 @@
+    less than *_PHYS_OFFSET from the first available memory location. */
+ # define LINUX_PHYS_OFFSET        (0x00008000)
+ # define LINUX_INITRD_PHYS_OFFSET (LINUX_PHYS_OFFSET + 0x02000000)
+-# define LINUX_FDT_PHYS_OFFSET    (LINUX_INITRD_PHYS_OFFSET - 0x10000)
++# define LINUX_FDT_PHYS_OFFSET    0x10cf0000
+ static inline grub_addr_t
+ grub_arm_firmware_get_boot_data (void)
+ {
+-- 
+1.9.1
+
