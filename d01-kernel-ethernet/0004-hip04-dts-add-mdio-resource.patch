@@ -1,0 +1,119 @@
+From b9e8ece2e755f436496f0e635e5ecba27dc2352a Mon Sep 17 00:00:00 2001
+From: Zhangfei Gao <zhangfei.gao@linaro.org>
+Date: Tue, 18 Feb 2014 17:29:46 +0800
+Subject: [PATCH 4/5] hip04: dts: add mdio resource
+
+Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+---
+ arch/arm/boot/dts/hip04.dtsi | 82 +++++++++++++++++++-------------------------
+ 1 file changed, 35 insertions(+), 47 deletions(-)
+
+diff --git a/arch/arm/boot/dts/hip04.dtsi b/arch/arm/boot/dts/hip04.dtsi
+index b20262a..068cb0c 100644
+--- a/arch/arm/boot/dts/hip04.dtsi
++++ b/arch/arm/boot/dts/hip04.dtsi
+@@ -269,20 +269,29 @@
+ 			interrupts = <0 372 4>;
+ 		};
+ 
+-	};
++		mdio {
++			compatible = "hisilicon,hip04-mdio";
++			reg = <0x28f1000 0x1000>;
++			#address-cells = <1>;
++			#size-cells = <0>;
+ 
+-	etb@0,e3c42000 {
+-		compatible = "arm,coresight-etb10", "arm,primecell";
+-		reg = <0 0xe3c42000 0 0x1000>;
++			phy0: ethernet-phy@0 {
++				reg = <0>;
++				marvell,reg-init = <18 0x14 0 0x8001>;
++				device_type = "ethernet-phy";
++			};
+ 
+-		clocks = <&clk_375m>;
+-		clock-names = "apb_pclk";
+-		port {
+-			etb0_in_port: endpoint@0 {
+-				slave-mode;
+-				remote-endpoint = <&replicator0_out_port0>;
++			phy1: ethernet-phy@1 {
++				reg = <1>;
++				marvell,reg-init = <18 0x14 0 0x8001>;
++				device_type = "ethernet-phy";
+ 			};
+ 		};
++
++		ppebase: ppebase@28c0000 {
++			compatible = "hisilicon,hip04-ppebase";
++			reg = <0x28c0000 0x10000>;
++		};
+ 	};
+ 
+ 	etb@0,e3c82000 {
+@@ -299,45 +308,24 @@
+ 		};
+ 	};
+ 
+-	etb@0,e3cc2000 {
+-		compatible = "arm,coresight-etb10", "arm,primecell";
+-		reg = <0 0xe3cc2000 0 0x1000>;
+-
+-		clocks = <&clk_375m>;
+-		clock-names = "apb_pclk";
+-		port {
+-			etb2_in_port: endpoint@0 {
+-				slave-mode;
+-				remote-endpoint = <&replicator2_out_port0>;
+-			};
++		ge0: ethernet@2800000 {
++			compatible = "hisilicon,hip04-mac";
++			reg = <0x2800000 0x10000>;
++			interrupts = <0 402 4>;
++			port = <0>;
++			speed = <1000>;
++			id = <1>;
++			phy-handle = <&phy0>;
+ 		};
+-	};
+ 
+-	etb@0,e3d02000 {
+-		compatible = "arm,coresight-etb10", "arm,primecell";
+-		reg = <0 0xe3d02000 0 0x1000>;
+-
+-		clocks = <&clk_375m>;
+-		clock-names = "apb_pclk";
+-		port {
+-			etb3_in_port: endpoint@0 {
+-				slave-mode;
+-				remote-endpoint = <&replicator3_out_port0>;
+-			};
+-		};
+-	};
+-
+-	tpiu@0,e3c05000 {
+-		compatible = "arm,coresight-tpiu", "arm,primecell";
+-		reg = <0 0xe3c05000 0 0x1000>;
+-
+-		clocks = <&clk_375m>;
+-		clock-names = "apb_pclk";
+-		port {
+-			tpiu_in_port: endpoint@0 {
+-				slave-mode;
+-				remote-endpoint = <&funnel4_out_port0>;
+-			};
++		ge8: ethernet@2880000 {
++			compatible = "hisilicon,hip04-mac";
++			reg = <0x2880000 0x10000>;
++			interrupts = <0 410 4>;
++			port = <8>;
++			speed = <1000>;
++			id = <2>;
++			phy-handle = <&phy1>;
+ 		};
+ 	};
+ };
+-- 
+1.9.1
+

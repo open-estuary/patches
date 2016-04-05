@@ -1,0 +1,39 @@
+From 3cd79dd7b8f6748b5fee3fbe65245cb85c27ea0b Mon Sep 17 00:00:00 2001
+From: Kefeng Wang <wangkefeng.wang@huawei.com>
+Date: Tue, 26 Aug 2014 16:02:58 +0800
+Subject: [PATCH 2/5] hip04: serdes: fix build error due to macro __DATE__
+
+When gcc update to 4.9, some new feature were introduced, like the -Wdate-time
+option, it has been added for the C, C++ and Fortran compilers, which warns when
+the __DATE__, __TIME__ or __TIMESTAMP__ macros are used.
+
+The kernel with '-Werror=date-time' option, so the build error is occured. We drop
+the unused MCSS_PrintkBuildTime() to fix build error.
+
+BTW, if use the latest UEFi, the serdes driver in kernel could be abandoned.
+
+Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+---
+ drivers/misc/serdes/SRE_drv.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/drivers/misc/serdes/SRE_drv.c b/drivers/misc/serdes/SRE_drv.c
+index 322825b..71db552 100644
+--- a/drivers/misc/serdes/SRE_drv.c
++++ b/drivers/misc/serdes/SRE_drv.c
+@@ -302,12 +302,6 @@ void MCSS_SetPrintkLevel(UINT32 printlevel)
+     g_uwPrintkLevel = printlevel;
+ }
+ 
+-void MCSS_PrintkBuildTime(void)
+-{
+-#define	MC_MOD_VERSION "Euler Test"
+-    printk("mcss_mod version: %s, build time: %s %s\n", MC_MOD_VERSION, __DATE__, __TIME__);
+-}
+-
+ UINT32 SRE_IoMemInit(VOID)
+ {
+     int rc = 0;
+-- 
+1.9.1
+
