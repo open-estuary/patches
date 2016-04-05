@@ -1,7 +1,7 @@
-From bf19a1e123fd09552165bd0d2b19ccf438c0a46c Mon Sep 17 00:00:00 2001
+From 8495b43519891158cdbb481b151871724332529b Mon Sep 17 00:00:00 2001
 From: Paulo Flabiano Smorigo <pfsmorigo@br.ibm.com>
 Date: Tue, 27 Nov 2012 17:22:07 -0200
-Subject: [PATCH 100/152] Search for specific config file for netboot
+Subject: [PATCH 1/2] Search for specific config file for netboot
 
 This patch implements a search for a specific configuration when the config
 file is on a remoteserver. It uses the following order:
@@ -15,17 +15,19 @@ http://www.syslinux.org/wiki/index.php/PXELINUX#config
 
 This should close the bugzilla:
 https://bugzilla.redhat.com/show_bug.cgi?id=873406
+
+Signed-off-by: chenzhihui <chenzhihui4@huawei.com>
 ---
- grub-core/net/net.c     | 118 ++++++++++++++++++++++++++++++++++++++++++++++++
+ grub-core/net/net.c     | 120 ++++++++++++++++++++++++++++++++++++++++++++++++
  grub-core/normal/main.c |  18 ++++++--
  include/grub/net.h      |   3 ++
- 3 files changed, 135 insertions(+), 4 deletions(-)
+ 3 files changed, 137 insertions(+), 4 deletions(-)
 
 diff --git a/grub-core/net/net.c b/grub-core/net/net.c
-index f2e723b..578e057 100644
+index a0472d5..d0c4794 100644
 --- a/grub-core/net/net.c
 +++ b/grub-core/net/net.c
-@@ -1702,6 +1702,124 @@ grub_net_restore_hw (void)
+@@ -1741,6 +1741,126 @@ grub_net_restore_hw (void)
    return GRUB_ERR_NONE;
  }
  
@@ -75,13 +77,15 @@ index f2e723b..578e057 100644
 +    {
 +      /* By the Client UUID. */
 +
-+      char client_uuid_var[sizeof ("net_") + grub_strlen (inf->name) +
-+                           sizeof ("_clientuuid") + 1];
-+      grub_snprintf (client_uuid_var, sizeof (client_uuid_var),
-+                     "net_%s_clientuuid", inf->name);
-+
++	  char *client_uuid_var;
 +      const char *client_uuid;
++
++	  client_uuid_var = grub_xasprintf("net_%s__clientuuid", inf->name);
++	  if (client_uuid_var == NULL)
++		  continue;
++
 +      client_uuid = grub_env_get (client_uuid_var);
++	  grub_free(client_uuid_var);
 +
 +      if (client_uuid)
 +        {
@@ -151,7 +155,7 @@ index f2e723b..578e057 100644
  
  static grub_command_t cmd_addaddr, cmd_deladdr, cmd_addroute, cmd_delroute;
 diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
-index f72844c..85d2a28 100644
+index 78a70a8..e5691a3 100644
 --- a/grub-core/normal/main.c
 +++ b/grub-core/normal/main.c
 @@ -33,6 +33,7 @@
@@ -162,7 +166,7 @@ index f72844c..85d2a28 100644
  
  GRUB_MOD_LICENSE ("GPLv3+");
  
-@@ -365,10 +366,19 @@ grub_cmd_normal (struct grub_command *cmd __attribute__ ((unused)),
+@@ -323,10 +324,19 @@ grub_cmd_normal (struct grub_command *cmd __attribute__ ((unused)),
  
        prefix = grub_env_get ("prefix");
        if (prefix)
@@ -187,12 +191,10 @@ index f72844c..85d2a28 100644
  	  grub_enter_normal_mode (config);
  	  grub_free (config);
 diff --git a/include/grub/net.h b/include/grub/net.h
-index 59e5975..88fc71c 100644
+index 538baa3..b62643a 100644
 --- a/include/grub/net.h
 +++ b/include/grub/net.h
-@@ -535,6 +535,9 @@ extern char *grub_net_default_server;
- 
- #define GRUB_NET_TRIES 40
+@@ -538,4 +538,7 @@ extern char *grub_net_default_server;
  #define GRUB_NET_INTERVAL 400
  #define GRUB_NET_INTERVAL_ADDITION 20
  
@@ -201,5 +203,5 @@ index 59e5975..88fc71c 100644
 +
  #endif /* ! GRUB_NET_HEADER */
 -- 
-1.9.3
+1.9.1
 
