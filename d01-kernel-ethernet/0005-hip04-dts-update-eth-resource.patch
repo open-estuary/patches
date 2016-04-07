@@ -1,0 +1,83 @@
+From aba90feed5b92b0fc129ef47de12066e0b723a60 Mon Sep 17 00:00:00 2001
+From: Zhangfei Gao <zhangfei.gao@linaro.org>
+Date: Fri, 13 Jun 2014 13:45:54 +0800
+Subject: [PATCH 5/5] hip04: dts: update eth resource
+
+Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+---
+ arch/arm/boot/dts/hip04.dtsi | 35 ++++++++++++-----------------------
+ 1 file changed, 12 insertions(+), 23 deletions(-)
+
+diff --git a/arch/arm/boot/dts/hip04.dtsi b/arch/arm/boot/dts/hip04.dtsi
+index 068cb0c..979c405 100644
+--- a/arch/arm/boot/dts/hip04.dtsi
++++ b/arch/arm/boot/dts/hip04.dtsi
+@@ -278,43 +278,33 @@
+ 			phy0: ethernet-phy@0 {
+ 				reg = <0>;
+ 				marvell,reg-init = <18 0x14 0 0x8001>;
+-				device_type = "ethernet-phy";
+ 			};
+ 
+ 			phy1: ethernet-phy@1 {
+ 				reg = <1>;
+ 				marvell,reg-init = <18 0x14 0 0x8001>;
+-				device_type = "ethernet-phy";
+ 			};
+ 		};
+ 
+-		ppebase: ppebase@28c0000 {
+-			compatible = "hisilicon,hip04-ppebase";
++		ppe: ppe@28c0000 {
++			compatible = "hisilicon,hip04-ppe", "syscon";
+ 			reg = <0x28c0000 0x10000>;
+ 		};
+-	};
+-
+-	etb@0,e3c82000 {
+-		compatible = "arm,coresight-etb10", "arm,primecell";
+-		reg = <0 0xe3c82000 0 0x1000>;
+ 
+-		clocks = <&clk_375m>;
+-		clock-names = "apb_pclk";
+-		port {
+-			etb1_in_port: endpoint@0 {
+-				slave-mode;
+-				remote-endpoint = <&replicator1_out_port0>;
+-			};
++		fe: ethernet@28b0000 {
++			compatible = "hisilicon,hip04-mac";
++			reg = <0x28b0000 0x10000>;
++			interrupts = <0 413 4>;
++			phy-mode = "mii";
++			port-handle = <&ppe 31 0>;
+ 		};
+-	};
+ 
+ 		ge0: ethernet@2800000 {
+ 			compatible = "hisilicon,hip04-mac";
+ 			reg = <0x2800000 0x10000>;
+ 			interrupts = <0 402 4>;
+-			port = <0>;
+-			speed = <1000>;
+-			id = <1>;
++			phy-mode = "sgmii";
++			port-handle = <&ppe 0 1>;
+ 			phy-handle = <&phy0>;
+ 		};
+ 
+@@ -322,9 +312,8 @@
+ 			compatible = "hisilicon,hip04-mac";
+ 			reg = <0x2880000 0x10000>;
+ 			interrupts = <0 410 4>;
+-			port = <8>;
+-			speed = <1000>;
+-			id = <2>;
++			phy-mode = "sgmii";
++			port-handle = <&ppe 8 2>;
+ 			phy-handle = <&phy1>;
+ 		};
+ 	};
+-- 
+1.9.1
+
